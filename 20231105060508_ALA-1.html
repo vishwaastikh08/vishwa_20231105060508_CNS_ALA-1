@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AES Algorithm Chat-Box</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      text-align: center;
+      padding: 20px;
+    }
+    h2 {
+      color: #37474f;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .chat-box {
+      width: 400px;
+      margin: 15px auto;
+      border-radius: 15px;
+      padding: 15px;
+      background: #ffffff;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    .header {
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 12px 12px 0 0;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      color: #2c3e50;
+    }
+    .messages {
+      min-height: 50px;
+      margin: 10px 0;
+    }
+    .message {
+      padding: 8px 12px;
+      margin: 5px 0;
+      display: inline-block;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .sent {
+      background: #e1f5fe;  /* light blue */
+      color: #000;
+      float: right;
+      clear: both;
+    }
+    .received {
+      background: #fce4ec; /* light pink */
+      color: #000;
+      float: left;
+      clear: both;
+    }
+    .input-box {
+      display: flex;
+      margin-top: 10px;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid #bbb;
+      outline: none;
+    }
+    .input-box button {
+      margin-left: 8px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      color: #2c3e50;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .input-box button:hover {
+      opacity: 0.85;
+    }
+    .process {
+      margin-top: 20px;
+      background: #f9fbe7;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: left;
+      width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+      border-left: 6px solid #a1c4fd;
+    }
+    .process h3 {
+      margin-top: 0;
+      color: #37474f;
+    }
+  </style>
+</head>
+<body>
+  <h2>💬 Chat-Box 💬 </h2>
+
+  <!-- User A -->
+  <div class="chat-box">
+    <div class="header">User A</div>
+    <div class="messages" id="userAMessages"></div>
+    <div class="input-box">
+      <input type="text" id="userAInput" placeholder="Type message...">
+      <button onclick="sendMessage('A')">Send</button>
+    </div>
+  </div>
+
+  <!-- User B -->
+  <div class="chat-box">
+    <div class="header">User B</div>
+    <div class="messages" id="userBMessages"></div>
+    <div class="input-box">
+      <input type="text" id="userBInput" placeholder="Type message...">
+      <button onclick="sendMessage('B')">Send</button>
+    </div>
+  </div>
+
+  <!-- Encryption/Decryption Process -->
+  <div class="process" id="processBox">
+    <h3>🔐 AES Encryption/Decryption Process</h3>
+    <p><b>Plaintext:</b> </p>
+    <p><b>Encrypted:</b> </p>
+    <p><b>Decrypted:</b> </p>
+  </div>
+
+  <script>
+    const secretKey = "MySecretKey123";
+
+    function sendMessage(user) {
+      let input, message, encrypted, decrypted;
+
+      if (user === 'A') {
+        input = document.getElementById("userAInput");
+        message = input.value;
+        if (message.trim() === "") return;
+        document.getElementById("userAMessages").innerHTML += `<div class="message sent">${message}</div>`;
+      } else {
+        input = document.getElementById("userBInput");
+        message = input.value;
+        if (message.trim() === "") return;
+        document.getElementById("userBMessages").innerHTML += `<div class="message sent">${message}</div>`;
+      }
+
+      // AES Encryption
+      encrypted = CryptoJS.AES.encrypt(message, secretKey).toString();
+
+      // AES Decryption
+      decrypted = CryptoJS.AES.decrypt(encrypted, secretKey).toString(CryptoJS.enc.Utf8);
+
+      // Show to other user
+      if (user === 'A') {
+        document.getElementById("userBMessages").innerHTML += `<div class="message received">${decrypted}</div>`;
+      } else {
+        document.getElementById("userAMessages").innerHTML += `<div class="message received">${decrypted}</div>`;
+      }
+
+      // Update encryption process
+      document.getElementById("processBox").innerHTML = `
+        <h3>🔐 AES Encryption/Decryption Process</h3>
+        <p><b>Plaintext:</b> ${message}</p>
+        <p><b>Encrypted:</b> ${encrypted}</p>
+        <p><b>Decrypted:</b> ${decrypted}</p>
+      `;
+
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
